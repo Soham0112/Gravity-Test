@@ -12,11 +12,11 @@ pygame.display.set_caption("GRAVITY")
 BLUE = (100, 149, 237)
 RED = (188, 39, 50)
 G = 6.67428e-11
-EARTH_MASS=1e+19
-MARS_MASS=5e+17
+EARTH_MASS=2e+19
+MARS_MASS=2e+19
 MERCURY_MASS=8e+17
 # OFFSET=0.0001
-dt=0.0001
+dt=0.0008
 
 
 def nor_tang(vector1,vector2):
@@ -36,19 +36,23 @@ class Planet:
         self.color = color
         self.mass = mass
 
+        self.orbit=[]
+
         self.x_vel=0
         self.y_vel=0
 
     def draw_planet(self,window):
         x=self.x + WID/2
         y=self.y + HEI/2
-        # if len(self.orbit) >= 2:
-        #     updated_points = []
-        #     for point in self.orbit:
-        #         x, y = point
-        #         updated_points.append((x, y))
+        if len(self.orbit) > 2:
+            updated_points = []
+            for point in self.orbit:
+                x, y = point
+                x = x  + WID / 2
+                y = y  + HEI / 2
+                updated_points.append((x, y))
 
-        #     pygame.draw.lines(window, self.color, False, updated_points, 2)
+            pygame.draw.lines(window, self.color, False, updated_points, 2)
         pygame.draw.circle(window,self.color,(x,y),self.r)
 
     def handle_collision(self, planet2):
@@ -145,19 +149,20 @@ class Planet:
         self.y_vel= self.y_vel + (a1y * dt)
         
         self.x = self.x + (self.x_vel * dt) 
-        self.y = self.y + (self.y_vel * dt)    
+        self.y = self.y + (self.y_vel * dt)  
+        self.orbit.append((self.x, self.y))  
 
 def main():
     clock = pygame.time.Clock()
     running = True
 	
-    earth=Planet(0,0,25,BLUE,EARTH_MASS)
+    earth=Planet(-300,0,25,BLUE,EARTH_MASS)
     earth.x_vel=0
-    earth.y_vel=0
+    earth.y_vel=-900
 
-    mars=Planet(300,-300,25,RED,MARS_MASS)
+    mars=Planet(300,0,25,RED,MARS_MASS)
     # mars.x_vel= 10
-    mars.y_vel=1000
+    mars.y_vel=900
     mars.x_vel=0
 
     # mercury=Planet(350,200,25,RED,MERCURY_MASS)
@@ -166,7 +171,7 @@ def main():
     planets=[earth,mars]
     while running:
         # poll for events
-        clock.tick(1000)
+        clock.tick(60)
         SCR.fill((0, 0, 0))
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
